@@ -344,6 +344,8 @@ Spark uses a master/slave architecture. As you can see in the figure, it has one
 8. Spark Datasets
 9. Spark DataFrames
 
+
+
 #### Flow of Execution
 
 With this in mind, when you submit an application to the cluster with spark-submit this is what happens internally:
@@ -377,6 +379,10 @@ Spark computes using RDD. The RDD supports two types of operations:
 
 1. Transformations - are operations (such as map, filter, join, union, and so on) that are performed on an RDD and which yield a new RDD containing the result.
 2. Actions - are operations (such as reduce, count, first, and so on) that return a value after running a computation on an RDD.
+
+Transformations in Spark are “lazy”, meaning that they do not compute their results right away. Instead, they just “remember” the operation to be performed and the dataset (e.g., file) to which the operation is to be performed. The transformations are only actually computed when an action is called and the result is returned to the driver program. This design enables Spark to run more efficiently. For example, if a big file was transformed in various ways and passed to first action, Spark would only process and return the result for the first line, rather than do the work for the entire file.
+
+By default, each transformed RDD may be recomputed each time you run an action on it. However, you may also persist an RDD in memory using the persist or cache method, in which case Spark will keep the elements around on the cluster for much faster access the next time you query it.
 
 
 
