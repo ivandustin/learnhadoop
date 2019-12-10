@@ -1,4 +1,6 @@
-# Learn Hadoop Ecosystem
+# Learn the Hadoop Ecosystem
+
+This document contains information for learning the Hadoop concepts and the basics of setting up a Hadoop system. This also includes information about Apache YARN and Apache Spark.
 
 
 
