@@ -551,5 +551,34 @@ df.show()
 
 The above program reads CSV from HDFS, returns a Spark DataFrame, and show the contents using the `.show()` method.
 
-> **Note:** Pandas DataFrame is different from Spark DataFrame.
+> **Note:** Spark DataFrame is different from Pandas DataFrame.
+
+
+
+### Spark Session
+
+To run a Python script in the command line:
+
+```shell
+spark-submit script.py
+```
+
+In the `script.py` you have to create a `SparkSession`.
+
+```python
+from pyspark.sql.session import SparkSession
+spark = SparkSession.builder \
+     .master("local") \
+     .appName("Word Count") \
+     .config("spark.some.config.option", "some-value") \
+     .getOrCreate()
+```
+
+The `SparkSession` initializes `SparkContext`, `SQLContext`, and `HiveContext`. All methods in those context can be accessed in the `SparkSession`.
+
+
+
+### Spark Master and Deploy Mode
+
+In `spark-submit` you can specify `--master` and `--deploy-mode` parameters. The `--master` accepts a URL of the `ClusterManager` or the Hadoop `NameNode`, or the string `local` to execute locally. The `--deploy-mode` accepts `client` or `cluster` value, to run the Spark Driver program locally or in one of the cluster node.
 
