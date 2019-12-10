@@ -308,6 +308,10 @@ spark.yarn.am.memory    512m
 
 ### Concepts
 
+
+
+#### Architecture
+
 ![Spark Architecture](https://i.stack.imgur.com/cwrMN.png)
 
 Spark uses a master/slave architecture. As you can see in the figure, it has one central coordinator (Driver) that communicates with many distributed workers (executors). The driver and each of the executors run in their own Java processes.
@@ -363,7 +367,7 @@ With this in mind, when you submit an application to the cluster with spark-subm
 
 
 
-#### Architecture
+#### Layers
 
 1. Spark Core - distributed data processing
 2. Spark SQL - port of Apache Hive to Apache Spark, for SQL
@@ -373,7 +377,21 @@ With this in mind, when you submit an application to the cluster with spark-subm
 
 
 
-#### Computation
+#### Resilient Distributed Datasets (RDDs)
+
+Spark revolves around the concept of a resilient distributed dataset (RDD), which is a fault-tolerant collection of elements that can be operated on in parallel. There are two ways to create RDDs: parallelizing an existing collection in your driver program, or referencing a dataset in an external storage system, such as a shared filesystem, HDFS, HBase, or any data source offering a Hadoop InputFormat.
+
+An example Python program.
+
+```python
+data = [1, 2, 3, 4, 5]
+distData = sc.parallelize(data)
+distData.reduce(lambda a, b: a + b)
+```
+
+Any data that is converted into RDD will be processed in parallel.
+
+> **Note:** One important parameter for parallel collections is the number of *partitions* to cut the dataset into. Spark will run one task for each partition of the cluster. Typically you want 2-4 partitions for each CPU in your cluster. Normally, Spark tries to set the number of partitions automatically based on your cluster. However, you can also set it manually by passing it as a second parameter to `parallelize` (e.g. `sc.parallelize(data, 10)`). Note: some places in the code use the term slices (a synonym for partitions) to maintain backward compatibility.
 
 Spark computes using RDD. The RDD supports two types of operations:
 
