@@ -237,7 +237,7 @@ Spark can work standalone or using Hadoop's YARN for cluster computing. It is id
 
 
 
-###Environment Variables
+### Environment Variables
 
 1. HADOOP_CONF_DIR
 2. SPARK_HOME
@@ -398,7 +398,7 @@ To run the same application in cluster mode, replace `--deploy-mode client`with 
 
 
 
-###Monitor Spark Applications
+### Monitor Spark Applications
 
 When you submit a job, Spark Driver automatically starts a web UI on port `4040` that displays information about the application. However, when execution is finished, the Web UI is dismissed with the application driver and can no longer be accessed.
 
