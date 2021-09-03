@@ -2,13 +2,7 @@
 
 This document contains information for learning the Hadoop concepts and the basics of setting up a Hadoop system. This also includes information about Apache YARN and Apache Spark.
 
-
-
-[TOC]
-
 ## Apache Hadoop
-
-
 
 ### Components
 
@@ -17,86 +11,118 @@ This document contains information for learning the Hadoop concepts and the basi
 3. MapReduce
 4. YARN
 
+### Pre-requisites
 
+1. Java - JDK 8
+
+    ```sh
+    sudo yum install epel-release -y
+    sudo yum update -y
+    sudo yum install -y java-1.8.0-openjdk
+    ```
+
+2. [Hadoop](https://hadoop.apache.org/releases.html) - v3.3.1
+
+    ```sh
+    sudo tar -zxvf hadoop-3.3.1.tar.gz -C /opt
+    export PATH=/opt/hadoop-3.3.1/bin:/opt/hadoop-3.3.1/sbin:$PATH
+    mkdir /var/hadoop
+    mkdir /var/hadoop/tmp
+    mkdir /var/hadoop/hdfs
+    ```
 
 ### Configurations
 
+1. hadoop-env.sh
+
+    ```txt
+    export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+    export HADOOP_HOME=/opt/hadoop-3.3.1
+    export HDFS_NAMENODE_USER=root
+    export HDFS_DATANODE_USER=root
+    export HDFS_SECONDARYNAMENODE_USER=root
+    ```
+
 1. core-site.xml - NameNode
 
-   ```xml
-   <?xml version="1.0" encoding="UTF-8"?>
-   <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-   <configuration>
-       <property>
-           <name>fs.default.name</name>
-           <value>hdfs://0.0.0.0:19000</value>
-       </property>
-   </configuration>
-   ```
+    ```xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    <configuration>
+        <property>
+            <name>fs.default.name</name>
+            <value>hdfs://localhost:9000</value>
+        </property>
+        <property>
+            <name>hadoop.tmp.dir</name>
+            <value>/var/hadoop/tmp</value>
+        </property>
+    </configuration>
+    ```
 
-2. hdfs-site.xml - HDFS
+1. hdfs-site.xml - HDFS
 
-   ```xml
-   <?xml version="1.0" encoding="UTF-8"?>
-   <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-   <configuration>
-      <property>
-         <name>dfs.replication</name>
-         <value>1</value>
-      </property>
-      <property>
-         <name>dfs.namenode.name.dir</name>
-         <value>E:\hdfs\namenode</value>
-      </property>
-      <property>
-         <name>dfs.datanode.data.dir</name>
-         <value>E:\hdfs\datanode</value>
-      </property>
-   	<property>
-   		<name>dfs.webhdfs.enabled</name>
-   		<value>true</value>
-   	</property>
-   	<property>
-   		<name>dfs.support.append</name>
-   		<value>true</value>
-   	</property>
-   	<property>
-   		<name>dfs.support.broken.append</name>
-   		<value>true</value>
-   	</property>
-   </configuration>
-   ```
+    ```xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    <configuration>
+        <property>
+            <name>dfs.replication</name>
+            <value>1</value>
+        </property>
+        <property>
+            <name>dfs.namenode.name.dir</name>
+            <value>/var/hadoop/hdfs/namenode</value>
+        </property>
+        <property>
+            <name>dfs.datanode.data.dir</name>
+            <value>/var/hadoop/hdfs/datanode</value>
+        </property>
+        <property>
+            <name>dfs.webhdfs.enabled</name>
+            <value>true</value>
+        </property>
+        <property>
+            <name>dfs.support.append</name>
+            <value>true</value>
+        </property>
+        <property>
+            <name>dfs.support.broken.append</name>
+            <value>true</value>
+        </property>
+    </configuration>
+    ```
 
-3. mapred-site.xml - MapReduce
+1. mapred-site.xml - MapReduce
 
-   ```xml
-   <?xml version="1.0" encoding="UTF-8"?>
-   <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-   <configuration>
-      <property>
-         <name>mapreduce.job.user.name</name>
-         <value>%USERNAME%</value>
-      </property>
-      <property>
-         <name>mapreduce.framework.name</name>
-         <value>yarn</value>
-      </property>
-      <property>
-         <name>yarn.apps.stagingDir</name>
-         <value>/user/%USERNAME%/staging</value>
-      </property>
-      <property>
-         <name>mapreduce.jobtracker.address</name>
-         <value>local</value>
-      </property>
-   </configuration>
-   ```
+    ```xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    <configuration>
+        <property>
+            <name>mapreduce.job.user.name</name>
+            <value>%USERNAME%</value>
+        </property>
+        <property>
+            <name>mapreduce.framework.name</name>
+            <value>yarn</value>
+        </property>
+        <property>
+            <name>yarn.apps.stagingDir</name>
+            <value>/user/%USERNAME%/staging</value>
+        </property>
+        <property>
+            <name>mapreduce.jobtracker.address</name>
+            <value>local</value>
+        </property>
+    </configuration>
+    ```
 
-4. yarn-site.xml - YARN
+1. yarn-site.xml - YARN
 
-   ```xml
-   <?xml version="1.0" encoding="UTF-8"?>
-   <configuration>
+    ```xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <configuration>
        <property>
            <name>yarn.nodemanager.aux-services</name>
            <value>mapreduce_shuffle</value>
@@ -117,62 +143,42 @@ This document contains information for learning the Hadoop concepts and the basi
            <name>yarn.log-aggregation-enable</name>
            <value>true</value>
        </property>
-   </configuration>
-   ```
-
-
-
-### Pre-requisites
-
-1. Java - JDK 8
-2. Hadoop - v2.9.1
-
-
-
-### Environment Variables
-
-1. JAVA_HOME
-2. HADOOP_HOME
-3. PATH - `/bin` and `/sbin`
-
-
+    </configuration>
+    ```
 
 ### Quick Setup
 
 1. Install pre-requisites.
 
-2. Setup environment variables.
+1. Configure Hadoop.
 
-3. Configure Hadoop.
+1. Format HDFS.
 
-4. Format HDFS.
+    ```bash
+    hdfs namenode -format
+    ```
 
-   ```bash
-   bin/hadoop namenode -format
-   ```
+1. Start all Hadoop daemons.
 
-5. Start all Hadoop daemons.
+    ```bash
+    start-dfs.sh
+    start-yarn.sh
+    ```
 
-   ```bash
-   sbin/start-dfs.sh
-   sbin/start-yarn.sh
-   ```
-6. Verify the health of NameNode by accessing http://localhost:50070/dfshealth.html. Make sure there are _live_ nodes and **no** _dead_ nodes.
+6. Verify the health of NameNode by accessing http://localhost:9870. Make sure there are _live_ nodes and **no** _dead_ nodes.
 
 7. Verify the health of ResourceManager by accessing http://localhost:8088. Make sure there are **no** _unhealthy_ nodes and there are _active_ nodes.
 
-   If there are unhealthy nodes due to disk utilization percentage exceeds YARN's default value of 90.0%, you can increase the threshold on `yarn-site.xml` with the following:
-   
-   ```xml
-   <property>
-       <name>yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage</name>
-       <value>98.5</value>
-   </property>
-   ```
-   
-   Restart YARN by `stop-yarn` and `start-yarn`.
+    If there are unhealthy nodes due to disk utilization percentage exceeds YARN's default value of 90.0%, you can increase the threshold on `yarn-site.xml` with the following:
 
+    ```xml
+    <property>
+        <name>yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage</name>
+        <value>98.5</value>
+    </property>
+    ```
 
+    Restart YARN by `stop-yarn` and `start-yarn`.
 
 ### Hadoop Daemons
 
@@ -181,18 +187,12 @@ This document contains information for learning the Hadoop concepts and the basi
 3. YARN - ResourceManager
 4. YARN - NodeManager
 
-
-
 ### Concepts
 
 1. Node Master (HDFS NameNode and YARN ResourceManager)
 2. Slave Nodes (HDFS DataNode and YARN NodeManager)
 
-
-
 ## Hadoop YARN
-
-
 
 ### Concepts
 
@@ -212,22 +212,16 @@ This document contains information for learning the Hadoop concepts and the basi
 
    It negotiates resources with the ResourceManager for the NodeManager.
 
-
-
 ## Apache Spark
 
 Spark is a general purpose cluster computing system. It can deploy and run parallel applications on clusters ranging from a single node to thousands of distributed nodes. Spark was originally designed to run Scala applications, but also supports Java, Python and R.
 
 Spark can work standalone or using Hadoop's YARN for cluster computing. It is ideal to use YARN for Spark.
 
-
-
 ### Modes
 
 1. Cluster Mode - runs everything inside the cluster.
 2. Client Mode - runs the computation on the client, such as your laptop.
-
-
 
 ### Pre-requisites
 
@@ -235,21 +229,15 @@ Spark can work standalone or using Hadoop's YARN for cluster computing. It is id
 2. Spark - v2.4.3
 3. Above 4GB RAM
 
-
-
 ### Environment Variables
 
 1. HADOOP_CONF_DIR
 2. SPARK_HOME
 3. PATH - `/bin` and `/sbin`
 
-
-
 ### Configurations
 
 1. spark-defaults.conf
-
-
 
 ### Integrating with YARN
 
@@ -257,19 +245,15 @@ Spark can work standalone or using Hadoop's YARN for cluster computing. It is id
 
 2. Edit `spark-defaults.conf` and add the following.
 
-   ```txt
-   spark.master    yarn
-   ```
-
-
+    ```txt
+    spark.master    yarn
+    ```
 
 ### Memory Allocation
 
 Allocation of Spark containers to run in YARN containers may fail if memory allocation is not configured properly. For nodes with less than 4G RAM, the default configuration is not adequate and may trigger swapping and poor performance, or even the failure of application initialization due to lack of memory.
 
 Be sure to understand how Hadoop YARN manages memory allocation before editing Spark memory settings so that your changes are compatible with your YARN cluster’s limits.
-
-
 
 #### Give Your YARN Containers Maximum Allowed
 
@@ -279,8 +263,6 @@ If the memory requested is above the maximum allowed, YARN will reject creation 
 2. Make sure that values for Spark memory allocation, configured in the following section, are below the maximum.
 
 This guide will use a sample value of `1536` for `yarn.scheduler.maximum-allocation-mb`. If your settings are lower, adjust the samples with your configuration.
-
-
 
 #### Configure the Spark Driver Memory Allocation in Cluster Mode
 
@@ -292,8 +274,6 @@ Set the default amount of memory allocated to Spark Driver in cluster mode via `
 spark.driver.memory    512m
 ```
 
-
-
 #### Configure the Spark Application Master Memory Allocation in Client Mode
 
 In **client mode**, the Spark driver will not run on the cluster, so the above configuration will have no effect. A YARN Application Master still needs to be created to schedule the Spark executor, and you can set its memory requirements.
@@ -304,11 +284,7 @@ Set the amount of memory allocated to Application Master in client mode with `sp
 spark.yarn.am.memory    512m
 ```
 
-
-
 ### Concepts
-
-
 
 #### Architecture
 
@@ -348,8 +324,6 @@ Spark uses a master/slave architecture. As you can see in the figure, it has one
 8. Spark Datasets
 9. Spark DataFrames
 
-
-
 #### Flow of Execution
 
 With this in mind, when you submit an application to the cluster with spark-submit this is what happens internally:
@@ -365,8 +339,6 @@ With this in mind, when you submit an application to the cluster with spark-subm
 
 7. With `SparkContext.stop()` from the driver or if the main method exits/crashes all the executors will be terminated and the cluster resources will be released by the cluster manager.
 
-
-
 #### Layers
 
 1. Spark Core - distributed data processing
@@ -374,8 +346,6 @@ With this in mind, when you submit an application to the cluster with spark-subm
 3. Spark MLib - machine learning library
 4. Spark Streaming API - real time processing with streaming data, like Apache Kafka
 5. Spark GraphX - graph computation
-
-
 
 #### Resilient Distributed Datasets (RDDs)
 
@@ -402,8 +372,6 @@ Transformations in Spark are “lazy”, meaning that they do not compute their 
 
 By default, each transformed RDD may be recomputed each time you run an action on it. However, you may also persist an RDD in memory using the persist or cache method, in which case Spark will keep the elements around on the cluster for much faster access the next time you query it.
 
-
-
 ### Submitting a Spark Program to the YARN Cluster
 
 Applications are submitted with the `spark-submit` command. The Spark installation package contains sample applications, like the parallel calculation of *Pi*, that you can run to practice starting Spark jobs.
@@ -420,8 +388,6 @@ The first parameter, `--deploy-mode`, specifies which mode to use, `client` or `
 
 To run the same application in cluster mode, replace `--deploy-mode client`with `--deploy-mode cluster`.
 
-
-
 ### Monitor Spark Applications
 
 When you submit a job, Spark Driver automatically starts a web UI on port `4040` that displays information about the application. However, when execution is finished, the Web UI is dismissed with the application driver and can no longer be accessed.
@@ -430,39 +396,37 @@ Spark provides a History Server that collects application logs from HDFS and dis
 
 1. Edit `$SPARK_HOME/conf/spark-defaults.conf` and add the following lines to enable Spark jobs to log in HDFS:
 
-   ```txt
-   spark.eventLog.enabled  true
-   spark.eventLog.dir hdfs://node-master:9000/spark-logs
-   ```
+    ```txt
+    spark.eventLog.enabled  true
+    spark.eventLog.dir hdfs://node-master:9000/spark-logs
+    ```
 
 2. Create the log directory in HDFS:
 
-   ```
-   hdfs dfs -mkdir /spark-logs
-   ```
+    ```
+    hdfs dfs -mkdir /spark-logs
+    ```
 
 3. Configure History Server related properties in `$SPARK_HOME/conf/spark-defaults.conf`:
 
-   ```txt
-   spark.history.provider            org.apache.spark.deploy.history.FsHistoryProvider
-   spark.history.fs.logDirectory     hdfs://node-master:9000/spark-logs
-   spark.history.fs.update.interval  10s
-   spark.history.ui.port             18080
-   ```
+    ```txt
+    spark.history.provider            org.apache.spark.deploy.history.FsHistoryProvider
+    spark.history.fs.logDirectory     hdfs://node-master:9000/spark-logs
+    spark.history.fs.update.interval  10s
+    spark.history.ui.port             18080
+    ```
 
-   You may want to use a different update interval than the default `10s`. If you specify a bigger interval, you will have some delay between what you see in the History Server and the real time status of your application. If you use a shorter interval, you will increase I/O on the HDFS.
+    You may want to use a different update interval than the default `10s`. If you specify a bigger interval, you will have some delay between what you see in the History Server and the real time status of your application. If you use a shorter interval, you will increase I/O on the HDFS.
 
 4. Run the History Server:
 
-   ```
-   $SPARK_HOME/sbin/start-history-server.sh
-   ```
+    ```
+    $SPARK_HOME/sbin/start-history-server.sh
+    ```
 
 5. Repeat steps from previous section to start a job with `spark-submit` that will generate some logs in the HDFS.
 
 6. Access the History Server by navigating to [http://node-master:18080](http://node-master:18080/) in a web browser:
-
-
 
 ### Run the Spark Shell
 
@@ -470,24 +434,22 @@ The Spark shell provides an interactive way to examine and work with your data.
 
 1. Put some data into HDFS for analysis. This example uses the text of *Alice In Wonderland* from the Gutenberg project:
 
-   ```
-   cd /home/hadoop
-   wget -O alice.txt https://www.gutenberg.org/files/11/11-0.txt
-   hdfs dfs -mkdir inputs
-   hdfs dfs -put alice.txt inputs
-   ```
+    ```
+    cd /home/hadoop
+    wget -O alice.txt https://www.gutenberg.org/files/11/11-0.txt
+    hdfs dfs -mkdir inputs
+    hdfs dfs -put alice.txt inputs
+    ```
 
 2. Start the Spark shell:
 
-   ```
-   spark-shell
-   
-   var input = spark.read.textFile("inputs/alice.txt")
-   // Count the number of non blank lines
-   input.filter(line => line.length()>0).count()
-   ```
+    ```
+    spark-shell
 
-
+    var input = spark.read.textFile("inputs/alice.txt")
+    // Count the number of non blank lines
+    input.filter(line => line.length()>0).count()
+    ```
 
 ### Quick Setup
 
@@ -495,44 +457,42 @@ The Spark shell provides an interactive way to examine and work with your data.
 
 2. Make sure the memory allocation of YARN containers are fine. Configure `yarn-site.xml` file.
 
-   ```xml
-   <property>
-       <name>yarn.scheduler.maximum-allocation-mb</name>
-       <value>2048</value>
-   </property>
-   ```
+    ```xml
+    <property>
+        <name>yarn.scheduler.maximum-allocation-mb</name>
+        <value>2048</value>
+    </property>
+    ```
 
-   The above gives 2GB maximum memory a YARN container can allocate.
+    The above gives 2GB maximum memory a YARN container can allocate.
 
 3. Configure Spark by editing `spark/conf/spark-defaults.conf` file.
 
-   ```txt
-   spark.master    		yarn
-   spark.driver.memory    	512m
-   spark.executor.memory  	512m
-   ```
+    ```txt
+    spark.master         yarn
+    spark.driver.memory      512m
+    spark.executor.memory    512m
+    ```
 
-   The `spark.master yarn` tells Spark that we will use YARN as the cluster manager. It also assigns maximum memory for the Spark Driver and Spark Executor.
+    The `spark.master yarn` tells Spark that we will use YARN as the cluster manager. It also assigns maximum memory for the Spark Driver and Spark Executor.
 
-   Make sure that the memory size does not exceed YARN container's maximum allocation memory.
+    Make sure that the memory size does not exceed YARN container's maximum allocation memory.
 
 4. Verify the setup by running a sample program.
 
-   ```shell
-   spark-submit --deploy-mode cluster --class org.apache.spark.examples.SparkPi   %SPARK_HOME%/examples/jars/spark-examples_2.11-2.4.3.jar 10
-   ```
+    ```shell
+    spark-submit --deploy-mode cluster --class org.apache.spark.examples.SparkPi   %SPARK_HOME%/examples/jars/spark-examples_2.11-2.4.3.jar 10
+    ```
 
-   Wait for the command to finish.
+    Wait for the command to finish.
 
-   To verify that it worked, go to YARN's ResourceManager Web UI at http://localhost:8088/ and check if the application status. If it failed, check the logs provided in the Web UI, or if your YARN's log aggregation is enabled, check the log using the following:
+    To verify that it worked, go to YARN's ResourceManager Web UI at http://localhost:8088/ and check if the application status. If it failed, check the logs provided in the Web UI, or if your YARN's log aggregation is enabled, check the log using the following:
 
-   ```shell
-   yarn logs -applicationId <APP_ID> >log.txt
-   ```
+    ```shell
+    yarn logs -applicationId <APP_ID> >log.txt
+    ```
 
-   You can obtain the App ID in the Web UI, for example: `application_1575031348949_0001`.
-
-
+    You can obtain the App ID in the Web UI, for example: `application_1575031348949_0001`.
 
 ### Hello World
 
@@ -552,8 +512,6 @@ df.show()
 The above program reads CSV from HDFS, returns a Spark DataFrame, and show the contents using the `.show()` method.
 
 > **Note:** Spark DataFrame is different from Pandas DataFrame.
-
-
 
 ### Spark Session
 
@@ -576,9 +534,6 @@ spark = SparkSession.builder \
 
 The `SparkSession` initializes `SparkContext`, `SQLContext`, and `HiveContext`. All methods in those context can be accessed in the `SparkSession`.
 
-
-
 ### Spark Master and Deploy Mode
 
 In `spark-submit` you can specify `--master` and `--deploy-mode` parameters. The `--master` accepts a URL of the `ClusterManager` or the Hadoop `NameNode`, or the string `local` to execute locally. The `--deploy-mode` accepts `client` or `cluster` value, to run the Spark Driver program locally or in one of the cluster node.
-
